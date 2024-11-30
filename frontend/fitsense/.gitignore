@@ -25,8 +25,9 @@ yarn-error.log*
 # VSCode settings
 .vscode
 
-# Ignore old signin and signup files - replaced by form.js
+# Ignore old auth, signin and signup files - replaced by form.js
 src/pages/signin.jsx
 src/pages/signup.jsx
+src/components/auth.js
 
 README.md
