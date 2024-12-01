@@ -6,13 +6,13 @@ import { getFirestore } from "firebase/firestore";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCVVVUTdPc-1Hn1ynYi9FSwHxmpLmUC7AM",
-  authDomain: "fitsense-49348.firebaseapp.com",
-  projectId: "fitsense-49348",
-  storageBucket: "fitsense-49348.firebasestorage.app",
-  messagingSenderId: "496113716665",
-  appId: "1:496113716665:web:31cb8a38413e99c77bfa68",
-  measurementId: "G-R5H4F1SVNQ"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);

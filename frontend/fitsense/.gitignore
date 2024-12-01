@@ -30,4 +30,7 @@ src/pages/signin.jsx
 src/pages/signup.jsx
 src/components/auth.js
 
+#Ignore env containing api information
+.env
+
 README.md
