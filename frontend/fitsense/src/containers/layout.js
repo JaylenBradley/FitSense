@@ -18,7 +18,7 @@ const Layout = () => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 setIsAuthenticated(true);
-                setUserName(user.displayName || user.email);
+                setUserName(user.displayName);
             } else {
                 setIsAuthenticated(false);
                 setUserName('');

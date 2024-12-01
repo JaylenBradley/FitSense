@@ -48,7 +48,7 @@ const Workouts = () => {
         <div style={{ padding: '24px' }}>
             <Title level={2}>Your Workouts</Title>
             {workouts.length === 0 ? (
-                <Paragraph>No workouts found.</Paragraph>
+                <Paragraph>No workouts found</Paragraph>
             ) : (
                 <Row gutter={[16, 16]}>
                     {workouts.map((workout) => (
