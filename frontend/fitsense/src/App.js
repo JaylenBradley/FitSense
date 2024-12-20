@@ -14,13 +14,14 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Layout />}>
-                    <Route index element={<Home />} /> 
+                    <Route index element={<Home />} />
+                    <Route path="home" element={<Home />} /> 
                     <Route path="signin" element={<AuthForm isSignUp={false} />} />
                     <Route path="signup" element={<AuthForm isSignUp={true} />} />
                     <Route path="workouts" element={<Workouts />} />
                     <Route path="create" element={<CreateWorkout />} />
-                    <Route path="workouts/:id" element={<WorkoutDetails />} />
-                    <Route path="workouts/:id/edit" element={<UpdateWorkout />} />
+                    <Route path="workout/:id" element={<WorkoutDetails />} />
+                    <Route path="workout/:id/edit" element={<UpdateWorkout />} />
                     <Route path="*" element={<ErrorPage />} /> 
                 </Route>
             </Routes>
@@ -29,3 +30,4 @@ const App = () => {
 };
 
 export default App;
+

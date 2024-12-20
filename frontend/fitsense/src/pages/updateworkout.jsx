@@ -2,11 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import { doc, getDoc, updateDoc, collection } from "firebase/firestore";
-import { Card, Button, Form, Input, Row, Col, Divider, Typography, Tag, Select, List, Spin } from 'antd';
-
-const { Title } = Typography;
-const { TextArea } = Input;
-const { Option } = Select;
+import Button from "../components/button";
 
 const UpdateWorkout = () => {
     const { id } = useParams();
@@ -16,8 +12,8 @@ const UpdateWorkout = () => {
     const [tags, setTags] = useState([]);
     const [newTag, setNewTag] = useState("");
     const [description, setDescription] = useState("");
-    const [notes, setNotes] = useState("");
     const [isFavorite, setIsFavorite] = useState(false);
+
     const [days, setDays] = useState({
         Monday: [],
         Tuesday: [],
@@ -47,7 +43,6 @@ const UpdateWorkout = () => {
                     setType(data.type);
                     setTags(data.tags);
                     setDescription(data.description);
-                    setNotes(data.notes);
                     setIsFavorite(data.isFavorite);
                     setDays(data.days);
                 } else {
@@ -96,33 +91,26 @@ const UpdateWorkout = () => {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
 
-    const handleSaveWorkout = async () => {
-        const hasExercises = Object.values(days).some(day => day.length > 0);
-        if (!hasExercises) {
-            alert("Please add at least one exercise to the workout");
-            return;
-        }
-
+    const handleSaveWorkout = async (e) => {
+        e.preventDefault();
+        
         if (!name) {
             alert("Please enter a workout name");
             return;
         }
-
-        const currentDate = new Date();
-
+    
         try {
-            await updateDoc(doc(workoutCollectionRef, id), {
+            await updateDoc(doc(db, "workout-programs", id), {
                 name,
                 type,
                 tags,
                 description,
-                notes,
                 isFavorite,
                 days,
-                updatedAt: currentDate.toISOString()
+                updatedAt: new Date().toISOString()
             });
             alert("Workout updated successfully!");
-            navigate(`/workouts/${id}`);
+            navigate("/workouts");
         } catch (err) {
             alert(err.message);
         }
@@ -130,132 +118,215 @@ const UpdateWorkout = () => {
 
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    if (!name) {
-        return <Spin tip="Loading..." />;
-    }
-
     return (
-        <Card style={{ margin: '24px' }}>
-            <Title level={2}>Update Workout</Title>
-            <Form layout="vertical">
-                <Form.Item label="Workout Name" required>
-                    <Input 
-                        placeholder="Enter workout name" 
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </Form.Item>
-                <Form.Item label="Workout Type" required>
-                    <Input 
-                        placeholder="Enter workout type" 
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                    />
-                </Form.Item>
-                <Form.Item label="Tags">
-                    <Input
-                        placeholder="Enter tag"
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        onPressEnter={handleAddTag}
-                    />
-                    <Button onClick={handleAddTag} style={{ marginTop: '8px' }}>Add Tag</Button>
-                    <div style={{ marginTop: '8px' }}>
-                        {tags.map((tag, index) => (
-                            <Tag key={index} closable onClose={() => handleRemoveTag(tag)}>
-                                {tag}
-                            </Tag>
-                        ))}
-                    </div>
-                </Form.Item>
-                <Form.Item label="Description">
-                    <TextArea 
-                        placeholder="Enter description" 
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                </Form.Item>
-                <Form.Item label="Notes">
-                    <TextArea 
-                        placeholder="Enter notes" 
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                    />
-                </Form.Item>
-                <Form.Item>
-                    <label>
-                        Favorite:
-                        <Input 
-                            type="checkbox" 
-                            checked={isFavorite}
-                            onChange={(e) => setIsFavorite(e.target.checked)}
-                        />
-                    </label>
-                </Form.Item>
-                <Divider />
-                <Form.Item label="Add Exercise">
-                    <Select value={currentDay} onChange={(value) => setCurrentDay(value)} style={{ width: '100%' }}>
-                        {daysOfWeek.map(day => (
-                            <Option key={day} value={day}>{day}</Option>
-                        ))}
-                    </Select>
-                    <Input 
-                        placeholder="Enter exercise name" 
-                        value={exerciseName}
-                        onChange={(e) => setExerciseName(e.target.value)}
-                        style={{ marginTop: '8px' }}
-                    />
-                    <Input 
-                        placeholder="Enter sets" 
-                        type="number" 
-                        value={sets}
-                        onChange={(e) => setSets(e.target.value < 0 ? "" : parseInt(e.target.value))}
-                        style={{ marginTop: '8px' }}
-                    />
-                    <Input 
-                        placeholder="Enter reps" 
-                        type="number" 
-                        value={reps}
-                        onChange={(e) => setReps(e.target.value < 0 ? "" : parseInt(e.target.value))}
-                        style={{ marginTop: '8px' }}
-                    />
-                    <Input 
-                        placeholder="Enter rest time" 
-                        type="number" 
-                        value={restTime}
-                        onChange={(e) => setRestTime(e.target.value < 0 ? "" : parseInt(e.target.value))}
-                        style={{ marginTop: '8px' }}
-                    />
-                    <Button onClick={handleAddExercise} style={{ marginTop: '8px' }}>Add Exercise</Button>
-                </Form.Item>
-                <Divider />
-                <Title level={3}>Exercises</Title>
-                {daysOfWeek.map(day => (
-                    <div key={day}>
-                        <Title level={4}>{day}</Title>
-                        <List
-                            bordered
-                            dataSource={days[day] || []}
-                            renderItem={(exercise, index) => (
-                                <List.Item key={index}>
-                                    {exercise.exerciseName}: {exercise.sets} {parseInt(exercise.sets) === 1 ? "set" : "sets"} x {exercise.reps} {parseInt(exercise.reps) === 1 ? "rep" : "reps"} - rest {exercise.restTime} {parseInt(exercise.restTime) === 1 ? "minute" : "minutes"}
-                                    <Button type="link" onClick={() => handleRemoveExercise(day, index)}>Remove</Button>
-                                </List.Item>
-                            )}
-                        />
-                    </div>
-                ))}
-                <Divider />
-                <Row gutter={16}>
-                    <Col>
-                        <Button type="primary" onClick={handleSaveWorkout}>Save Workout</Button>
-                    </Col>
-                    <Col>
-                        <Button onClick={() => navigate('/workouts')}>Cancel</Button>
-                    </Col>
-                </Row>
-            </Form>
-        </Card>
+        <div className="min-h-screen bg-zinc-800 p-8">
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-zinc-800/50 rounded-lg p-8 shadow-lg shadow-zinc-900/50 transition-all duration-300">
+                    <h1 className="text-3xl font-bold text-gray-300 mb-8">Update Workout</h1>
+                    
+                    <form onSubmit={handleSaveWorkout} className="space-y-6">
+
+                        {/* Basic Info Section */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-zinc-300">
+                                    Workout Name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="mt-1 block w-full rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 shadow-sm focus:border-red-400 focus:ring 
+                                             focus:ring-red-400 focus:ring-opacity-50 px-3 py-2"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-zinc-300">
+                                    Type
+                                </label>
+                                <input
+                                    type="text"
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value)}
+                                    className="mt-1 block w-full rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 shadow-sm focus:border-red-400 focus:ring 
+                                             focus:ring-red-400 focus:ring-opacity-50 px-3 py-2"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-zinc-300">Description</label>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    rows={4}
+                                    className="mt-1 block w-full rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 shadow-sm focus:border-red-400 focus:ring 
+                                             focus:ring-red-400 focus:ring-opacity-50 px-3 py-2"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Tags Section */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-zinc-300">Tags</label>
+                            <div className="flex flex-wrap gap-2">
+                                {tags.map((tag, index) => (
+                                    <span key={index} 
+                                          className="inline-flex items-center px-2.5 py-0.5 
+                                                   rounded-full text-sm bg-red-400/20 text-red-400">
+                                        {tag}
+                                        <button type="button"
+                                                onClick={() => handleRemoveTag(tag)}
+                                                className="ml-1.5 hover:text-red-300">
+                                            ×
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newTag}
+                                    onChange={(e) => setNewTag(e.target.value)}
+                                    className="flex-1 rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 px-3 py-2
+                                             transition-all duration-200
+                                             hover:bg-zinc-800"
+                                    placeholder="Add a tag"
+                                />
+                                <Button
+                                    type="button"
+                                    onClick={handleAddTag}
+                                >
+                                    Add Tag
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Exercises Section */}
+                        <div className="space-y-4">
+                            <h2 className="text-xl font-semibold text-zinc-300">Exercises</h2>
+                            <select
+                                value={currentDay}
+                                onChange={(e) => setCurrentDay(e.target.value)}
+                                className="block w-full rounded-md bg-zinc-900 border-zinc-700 
+                                         text-zinc-300 px-3 py-2
+                                         transition-all duration-200
+                                         hover:bg-zinc-800"
+                            >
+                                {daysOfWeek.map(day => (
+                                    <option key={day} value={day}>{day}</option>
+                                ))}
+                            </select>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Exercise Input Fields */}
+                                <input
+                                    type="text"
+                                    value={exerciseName}
+                                    onChange={(e) => setExerciseName(e.target.value)}
+                                    placeholder="Exercise name"
+                                    className="rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 px-3 py-2
+                                             transition-all duration-200
+                                             hover:bg-zinc-800"
+                                />
+                                <input 
+                                    placeholder="Enter sets" 
+                                    type="number" 
+                                    value={sets}
+                                    onChange={(e) => setSets(e.target.value < 0 ? "" : parseInt(e.target.value))}
+                                    className="rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 px-3 py-2
+                                             transition-all duration-200
+                                             hover:bg-zinc-800"
+                                />
+                                <input 
+                                    placeholder="Enter reps" 
+                                    type="number" 
+                                    value={reps}
+                                    onChange={(e) => setReps(e.target.value < 0 ? "" : parseInt(e.target.value))}
+                                    className="rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 px-3 py-2
+                                             transition-all duration-200
+                                             hover:bg-zinc-800"
+                                />
+                                <input 
+                                    placeholder="Enter rest time" 
+                                    type="number" 
+                                    value={restTime}
+                                    onChange={(e) => setRestTime(e.target.value < 0 ? "" : parseInt(e.target.value))}
+                                    className="rounded-md bg-zinc-900 border-zinc-700 
+                                             text-zinc-300 px-3 py-2
+                                             transition-all duration-200
+                                             hover:bg-zinc-800"
+                                />
+                            </div>
+
+                            <Button
+                                type="button"
+                                onClick={handleAddExercise}
+                            >
+                                Add Exercise
+                            </Button>
+
+                            {/* Exercise List */}
+                            <div className="mt-4">
+                                {days[currentDay].map((exercise, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center justify-between p-4 bg-zinc-900 rounded-lg mb-2"
+                                    >
+                                        <div>
+                                            <h3 className="text-zinc-300 font-medium">{exercise.exerciseName}</h3>
+                                            <p className="text-zinc-400">
+                                                {exercise.sets} sets × {exercise.reps} reps
+                                            </p>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            onClick={() => handleRemoveExercise(currentDay, index)}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Favorite Toggle Button */}
+                        <div className="flex items-center space-x-2 mb-4">
+                            <button
+                                type="button"
+                                onClick={() => setIsFavorite(!isFavorite)}
+                                className={`p-2 rounded-full transition-colors duration-200 
+                                 ${isFavorite ? 'text-red-400 hover:text-red-300' : 'text-gray-400 hover:text-gray-300'}`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill={isFavorite ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                            <label className="text-sm font-medium text-zinc-300">
+                                Mark as Favorite
+                            </label>
+                        </div>
+
+                        <div className="flex justify-end space-x-4 pt-6">
+                            <Button type="button" onClick={() => navigate(`/workout/${id}`)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit">
+                                Update Workout
+                            </Button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     );
 };
 
