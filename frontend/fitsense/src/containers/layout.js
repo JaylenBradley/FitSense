@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
-import { HomeIcon, UserIcon, PlusIcon, ViewListIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/react/outline';
+import { 
+  FiHome, 
+  FiUser,
+  FiChevronsLeft,
+  FiChevronsRight,
+} from 'react-icons/fi';
+import { IoFastFood } from "react-icons/io5";
+import { BiFoodMenu } from "react-icons/bi";
+import { GiWeightLiftingUp } from "react-icons/gi";
+import { FaDumbbell } from "react-icons/fa";
 import { auth } from '../config/firebase';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '../components/AuthContext';
@@ -38,21 +47,27 @@ const Layout = () => {
             className="text-gray-500 hover:text-fitsense transition-colors duration-200 focus:outline-none"
           >
             {collapsed ? 
-              <ChevronDoubleRightIcon className="h-5 w-5 text-stone-400" /> : 
-              <ChevronDoubleLeftIcon className="h-5 w-5 text-stone-400"/>}
+              <FiChevronsRight className="h-5 w-5 text-stone-400" /> : 
+              <FiChevronsLeft className="h-5 w-5 text-stone-400"/>}
           </button>
         </div>
         
         <nav className="flex-1 px-2 py-4">
           <ul className="space-y-2">
             <li>
-              <NavItem to="/" icon={HomeIcon} text="Home" collapsed={collapsed} />
+              <NavItem to="/" icon={FiHome} text="Home" collapsed={collapsed} />
             </li>
             <li>
-              <NavItem to="/workouts" icon={ViewListIcon} text="Workouts" collapsed={collapsed} />
+              <NavItem to="/workouts" icon={GiWeightLiftingUp} text="Workouts" collapsed={collapsed} />
             </li>
             <li>
-              <NavItem to="/create" icon={PlusIcon} text="Create Workout" collapsed={collapsed} />
+              <NavItem to="/create-workout" icon={FaDumbbell} text="Create Workout" collapsed={collapsed} />
+            </li>
+            <li>
+              <NavItem to="/meal-plans" icon={BiFoodMenu} text="Meal Plans" collapsed={collapsed} />
+            </li>
+            <li>
+              <NavItem to="/create-meal-plan" icon={IoFastFood} text="Create Meal Plan" collapsed={collapsed} />
             </li>
           </ul>
           
@@ -63,11 +78,17 @@ const Layout = () => {
           <ul className="space-y-2">
             {!user ? (
               <li>
-                <NavItem to="/signin" icon={UserIcon} text="Login" collapsed={collapsed} />
+                <NavItem to="/signin" icon={FiUser} text="Login" collapsed={collapsed} />
               </li>
             ) : (
               <li>
-                <NavItem icon={UserIcon} text="Logout" onClick={handleLogout} collapsed={collapsed} />
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center px-4 py-2 text-gray-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors duration-200"
+                >
+                  <FiUser className="h-5 w-5" />
+                  {!collapsed && <span className="ml-3">Logout</span>}
+                </button>
               </li>
             )}
           </ul>

@@ -33,19 +33,36 @@ const CreateWorkout = () => {
     const workoutCollectionRef = useMemo(() => collection(db, "workout-programs"), []);
 
     const handleAddExercise = () => {
-        if (!exerciseName || sets <= 0 || reps <= 0 || restTime < 0) {
-            alert("Please enter a valid exercise name, # of sets, # of reps and a rest time");
+        if (!exerciseName) {
+            alert("Please enter an exercise name");
             return;
         }
 
-        const newExercise = { exerciseName, reps, sets, restTime };
-        setDays({
-            ...days,
-            [currentDay]: [...days[currentDay], newExercise]
-        });
+        if (!sets || !reps || !restTime) {
+            alert("Please fill in all exercise details");
+            return;
+        }
+
+        if (sets < 0 || reps < 0 || restTime < 0) {
+            alert("Exercise values cannot be negative");
+            return;
+        }
+
+        const newExercise = {
+            exerciseName,
+            sets: Math.max(0, Number(sets)),
+            reps: Math.max(0, Number(reps)),
+            restTime: Math.max(0, Number(restTime))
+        };
+        setDays(prev => ({
+            ...prev,
+            [currentDay]: [...prev[currentDay], newExercise]
+        }));
+
+        // Reset form
         setExerciseName("");
-        setReps("");
         setSets("");
+        setReps("");
         setRestTime("");
     };
 
@@ -205,25 +222,28 @@ const CreateWorkout = () => {
                                 />
                                 <input
                                     type="number"
+                                    min="0"
                                     value={sets}
-                                    onChange={(e) => setSets(e.target.value)}
-                                    placeholder="Enter sets"
+                                    onChange={(e) => setSets(Math.max(0, Number(e.target.value)))}
+                                    placeholder="Number of sets"
                                     className="rounded-md bg-zinc-900 border-zinc-700 
                                              text-zinc-300 px-3 py-2"
                                 />
                                 <input
                                     type="number"
+                                    min="0"
                                     value={reps}
-                                    onChange={(e) => setReps(e.target.value)}
-                                    placeholder="Enter reps"
+                                    onChange={(e) => setReps(Math.max(0, Number(e.target.value)))}
+                                    placeholder="Number of reps"
                                     className="rounded-md bg-zinc-900 border-zinc-700 
                                              text-zinc-300 px-3 py-2"
                                 />
                                 <input
-                                    type="text"
+                                    type="number"
+                                    min="0"
                                     value={restTime}
-                                    onChange={(e) => setRestTime(e.target.value)}
-                                    placeholder="Enter rest time"
+                                    onChange={(e) => setRestTime(Math.max(0, Number(e.target.value)))}
+                                    placeholder="Rest time (seconds)"
                                     className="rounded-md bg-zinc-900 border-zinc-700 
                                              text-zinc-300 px-3 py-2"
                                 />

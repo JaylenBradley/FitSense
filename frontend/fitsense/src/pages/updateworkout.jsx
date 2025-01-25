@@ -57,19 +57,37 @@ const UpdateWorkout = () => {
     }, [id, workoutCollectionRef]);
 
     const handleAddExercise = () => {
-        if (!exerciseName || sets <= 0 || reps <= 0 || restTime < 0) {
-            alert("Please enter a valid exercise name, # of sets, # of reps and a rest time");
+        if (!exerciseName) {
+            alert("Please enter an exercise name");
             return;
         }
 
-        const newExercise = { exerciseName, reps, sets, restTime };
-        setDays({
-            ...days,
-            [currentDay]: [...days[currentDay], newExercise]
-        });
+        if (!sets || !reps || !restTime) {
+            alert("Please fill in all exercise details");
+            return;
+        }
+
+        if (sets < 0 || reps < 0 || restTime < 0) {
+            alert("Exercise values cannot be negative");
+            return;
+        }
+
+        const newExercise = {
+            exerciseName,
+            sets: Math.max(0, Number(sets)),
+            reps: Math.max(0, Number(reps)),
+            restTime: Math.max(0, Number(restTime))
+        };
+
+        setDays(prev => ({
+            ...prev,
+            [currentDay]: [...prev[currentDay], newExercise]
+        }));
+
+        // Reset form
         setExerciseName("");
-        setReps("");
         setSets("");
+        setReps("");
         setRestTime("");
     };
 
@@ -238,8 +256,9 @@ const UpdateWorkout = () => {
                                 <input 
                                     placeholder="Enter sets" 
                                     type="number" 
+                                    min="0"
                                     value={sets}
-                                    onChange={(e) => setSets(e.target.value < 0 ? "" : parseInt(e.target.value))}
+                                    onChange={(e) => setSets(Math.max(0, Number(e.target.value)))}
                                     className="rounded-md bg-zinc-900 border-zinc-700 
                                              text-zinc-300 px-3 py-2
                                              transition-all duration-200
@@ -248,8 +267,9 @@ const UpdateWorkout = () => {
                                 <input 
                                     placeholder="Enter reps" 
                                     type="number" 
+                                    min="0"
                                     value={reps}
-                                    onChange={(e) => setReps(e.target.value < 0 ? "" : parseInt(e.target.value))}
+                                    onChange={(e) => setReps(Math.max(0, Number(e.target.value)))}
                                     className="rounded-md bg-zinc-900 border-zinc-700 
                                              text-zinc-300 px-3 py-2
                                              transition-all duration-200
@@ -258,8 +278,9 @@ const UpdateWorkout = () => {
                                 <input 
                                     placeholder="Enter rest time" 
                                     type="number" 
+                                    min="0"
                                     value={restTime}
-                                    onChange={(e) => setRestTime(e.target.value < 0 ? "" : parseInt(e.target.value))}
+                                    onChange={(e) => setRestTime(Math.max(0, Number(e.target.value)))}
                                     className="rounded-md bg-zinc-900 border-zinc-700 
                                              text-zinc-300 px-3 py-2
                                              transition-all duration-200

@@ -31,7 +31,7 @@ const AuthForm = ({ isSignUp }) => {
         await signInWithEmailAndPassword(auth, email, password);
         alert('Sign in successful!');
       }
-      navigate('/workouts');
+      navigate('/home');
     } catch (err) {
       alert(err.message);
     }
@@ -42,7 +42,7 @@ const AuthForm = ({ isSignUp }) => {
     try {
       await signInWithPopup(auth, provider);
       alert('Signed in with Google successfully!');
-      navigate('/workouts');
+      navigate('/home');
     } catch (err) {
       alert(err.message);
     }
