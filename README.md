@@ -19,7 +19,6 @@ Live project: https://fit-sense.vercel.app/
 - Firebase (Authentication & Firestore)
 - Tailwind CSS
 - React Router
-- React Icons
 
 ## Getting Started
 
