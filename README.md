@@ -11,7 +11,7 @@ Live project: https://fit-sense.vercel.app/
 - 📊 Monitor your progress over time
 - ⭐ Save favorite workouts and meals
 - 🏷️ Tag and categorize your plans
-- 📱 Responsive design for all devices
+- 📱 Responsive design
 
 ## Technologies Used
 
